@@ -86,7 +86,7 @@ export async function getRasiPhalalu() {
     }
   }
 
-  return receivedDoc.body.innerHTML;
+  return [raasiPhalamUrl, receivedDoc.body.innerHTML];
 }
 
 // https://assets.eenadu.net/article_img/${}

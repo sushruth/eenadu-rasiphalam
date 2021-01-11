@@ -5,6 +5,7 @@ import { getRasiPhalalu } from './helper';
 
 export default function App() {
   const [data, setData] = React.useState<Data<any>>({ status: 'unfetched' });
+  const [article, setArticle] = React.useState('#');
 
   const fetchData = React.useCallback(async () => {
     setData({
@@ -12,7 +13,8 @@ export default function App() {
     });
 
     try {
-      const rasiphalam = await getRasiPhalalu();
+      const [originalArticleLink, rasiphalam] = await getRasiPhalalu();
+      setArticle(originalArticleLink);
       setData({
         status: 'success',
         data: rasiphalam,
@@ -41,9 +43,16 @@ export default function App() {
       case 'error':
         return <p>Some issue loading రాశిఫలం. Check logs.</p>;
       case 'success':
-        return <div dangerouslySetInnerHTML={{ __html: data.data }} />;
+        return (
+          <>
+            <a href={article} id="articleLink">
+              Source &#8599;
+            </a>
+            <div dangerouslySetInnerHTML={{ __html: data.data }} />
+          </>
+        );
     }
-  }, [data]);
+  }, [data, article]);
 
   return <div id="content">{content}</div>;
 }
