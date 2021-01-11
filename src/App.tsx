@@ -57,21 +57,18 @@ export default function App() {
     }
   }, [data.status, fetchData]);
 
-  if (data.status === 'unfetched') {
-    return <p>Data is not fetched yet</p>;
-  }
+  const content = React.useMemo(() => {
+    switch (data.status) {
+      case 'unfetched':
+        return <p>Data is not fetched yet</p>;
+      case 'fetching':
+        return <p>Loading రాశిఫలం &ellipse;</p>;
+      case 'error':
+        return <p>Some issue loading రాశిఫలం. Check logs.</p>;
+      case 'success':
+        return <div dangerouslySetInnerHTML={{ __html: data.data }} />;
+    }
+  }, [data]);
 
-  if (data.status === 'fetching') {
-    return <p>Loading రాశిఫలం &ellipse;</p>;
-  }
-
-  if (data.status === 'error') {
-    return <p>Some issue loading రాశిఫలం. Check logs.</p>;
-  }
-
-  if (data.status === 'success') {
-    return <div dangerouslySetInnerHTML={{ __html: data.data }} />;
-  }
-
-  return null;
+  return <div id="content">{content}</div>;
 }
