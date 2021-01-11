@@ -7,7 +7,33 @@
 
 #content * {
   line-height: 2;
-  font-size: 24px;
-  font-family: 'Baloo Tammudu 2', cursive;
+  font-size: 20px;
+  font-family: 'Baloo Tammudu 2', sans-serif;
   font-weight: 500;
+}
+
+#content h2 {
+  font-size: 26px;
+  font-weight: bold;
+  margin-bottom: 1em;
+}
+
+#content .nakshatramNames {
+  display: flex;
+  margin-bottom: 2em;
+}
+
+#content .nakshatramNames > span {
+  margin-right: 0.8em;
+  padding: 0.6em 0.5em 0.2em;
+  background: #dedede;
+  line-height: 1;
+  border-radius: 1em;
+}
+
+#content hr {
+  background: transparent;
+  color: transparent;
+  border-color: transparent;
+  height: 2em;
 }

@@ -1,6 +1,7 @@
 import * as React from 'react';
 import './styles.css';
 import { Data } from './App.types';
+import { getRasiPhalalu } from './helper';
 
 export default function App() {
   const [data, setData] = React.useState<Data<any>>({ status: 'unfetched' });
@@ -11,39 +12,13 @@ export default function App() {
     });
 
     try {
-      const sundayMagazinePage = await fetch(
-        'https://www.eenadu.net/sundaymagazine'
-      ).then((res) => res.text());
-
-      const articleLinkMatch = sundayMagazinePage.match(
-        /<a\s*href="https:\/\/www.eenadu.net\/sundaymagazine\/article\/(\d*?)"\s*>రాశిఫలం/i
-      );
-
-      if (!articleLinkMatch?.[1]) {
-        throw Error('Could not find article link');
-      }
-
-      const raasiPhalamUrl = `https://www.eenadu.net/sundaymagazine/article/${articleLinkMatch[1]}`;
-
-      const rasiPhalamArticle = await fetch(raasiPhalamUrl).then((res) =>
-        res.text()
-      );
-
-      const rasiPhalamContentMatch = rasiPhalamArticle.match(
-        /<\/center>([\s\S\n]*?)<center>/i
-      );
-
-      if (!rasiPhalamContentMatch) {
-        throw Error('Could not find content');
-      }
-
-      console.log(rasiPhalamContentMatch);
-
+      const rasiphalam = await getRasiPhalalu();
       setData({
         status: 'success',
-        data: rasiPhalamContentMatch[1],
+        data: rasiphalam,
       });
     } catch (error) {
+      console.error(error);
       setData({
         status: 'error',
         error,
@@ -62,7 +37,7 @@ export default function App() {
       case 'unfetched':
         return <p>Data is not fetched yet</p>;
       case 'fetching':
-        return <p>Loading రాశిఫలం &ellipse;</p>;
+        return <p>Loading రాశిఫలం &hellip;</p>;
       case 'error':
         return <p>Some issue loading రాశిఫలం. Check logs.</p>;
       case 'success':
