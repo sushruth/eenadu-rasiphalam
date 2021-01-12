@@ -64,17 +64,24 @@ export async function getRasiPhalalu() {
 
   const receivedDoc = parser.parseFromString(rasiPhalamArticle, 'text/html');
 
-  const article = receivedDoc.querySelector('section.fullstory');
+  const article =
+    receivedDoc.querySelector('section.fullstory') ||
+    receivedDoc.querySelector('.tel-newscontant');
 
   if (!article) {
     throw Error('No content found');
   }
 
+  // Remove amp-ads in case of mobile
+  article.querySelectorAll('amp-ad').forEach((el) => el.remove());
+
   article.querySelector('.nsocio')?.remove();
 
   for (const [key, replacementArray] of Object.entries(rasiReplacements)) {
-    const element = receivedDoc.querySelector(`img[src*="${key}"]`)
-      ?.parentElement;
+    const element = (
+      receivedDoc.querySelector(`img[src*="${key}"]`) ||
+      receivedDoc.querySelector(`amp-img[src*="${key}"]`)
+    )?.parentElement;
     if (element?.innerHTML) {
       element.innerHTML = `<div class="rasiHeader"><h2>${
         replacementArray[0]
