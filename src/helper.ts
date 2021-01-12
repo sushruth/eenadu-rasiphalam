@@ -55,15 +55,12 @@ export async function getRasiPhalalu() {
   }
 
   const raasiPhalamUrl = `https://www.eenadu.net/sundaymagazine/article/${articleLinkMatch}`;
-
   const rasiPhalamArticle = await fetch(raasiPhalamUrl).then((res) =>
     res.text()
   );
 
   const parser = new DOMParser();
-
   const receivedDoc = parser.parseFromString(rasiPhalamArticle, 'text/html');
-
   const article =
     receivedDoc.querySelector('section.fullstory') ||
     receivedDoc.querySelector('.tel-newscontant');
@@ -72,9 +69,9 @@ export async function getRasiPhalalu() {
     throw Error('No content found');
   }
 
-  // Remove amp-ads in case of mobile
+  // Remove unneceray elements
   article.querySelectorAll('amp-ad').forEach((el) => el.remove());
-
+  article.querySelectorAll('center').forEach((el) => el.remove());
   article.querySelector('.nsocio')?.remove();
 
   for (const [key, replacementArray] of Object.entries(rasiReplacements)) {
@@ -82,6 +79,7 @@ export async function getRasiPhalalu() {
       receivedDoc.querySelector(`img[src*="${key}"]`) ||
       receivedDoc.querySelector(`amp-img[src*="${key}"]`)
     )?.parentElement;
+
     if (element?.innerHTML) {
       element.innerHTML = `<div class="rasiHeader"><h2>${
         replacementArray[0]
@@ -93,7 +91,3 @@ export async function getRasiPhalalu() {
 
   return [raasiPhalamUrl, article.innerHTML];
 }
-
-// https://assets.eenadu.net/article_img/${}
-
-// /<img alt="" src="https:\/\/assets.eenadu.net\/article_img\/\d+RAASI_\d+_\d+.jpg" style="height:90px; width:300px">/
