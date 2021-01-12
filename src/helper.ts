@@ -45,34 +45,32 @@ export async function getRasiPhalalu() {
     'https://www.eenadu.net/sundaymagazine'
   ).then((res) => res.text());
 
-  const articleLinkMatch = sundayMagazinePage.match(
-    /<a\s*href="https:\/\/www.eenadu.net\/sundaymagazine\/article\/(\d*?)"\s*>రాశిఫలం/i
-  );
+  const [, , articleLinkMatch] =
+    sundayMagazinePage.match(
+      /<a\s*href="https:\/\/(www|m).eenadu.net\/sundaymagazine\/article\/(\d*?)"\s*>రాశిఫలం/i
+    ) ?? [];
 
-  if (!articleLinkMatch?.[1]) {
+  if (!articleLinkMatch) {
     throw Error('Could not find article link');
   }
 
-  const raasiPhalamUrl = `https://www.eenadu.net/sundaymagazine/article/${articleLinkMatch[1]}`;
+  const raasiPhalamUrl = `https://www.eenadu.net/sundaymagazine/article/${articleLinkMatch}`;
 
   const rasiPhalamArticle = await fetch(raasiPhalamUrl).then((res) =>
     res.text()
   );
 
-  const rasiPhalamContentMatch = rasiPhalamArticle.match(
-    /<\/center>([\s\S\n]*?)<center>/i
-  );
-
-  if (!rasiPhalamContentMatch) {
-    throw Error('Could not find content');
-  }
-
   const parser = new DOMParser();
 
-  const receivedDoc = parser.parseFromString(
-    rasiPhalamContentMatch[1],
-    'text/html'
-  );
+  const receivedDoc = parser.parseFromString(rasiPhalamArticle, 'text/html');
+
+  const article = receivedDoc.querySelector('section.fullstory');
+
+  if (!article) {
+    throw Error('No content found');
+  }
+
+  article.querySelector('.nsocio')?.remove();
 
   for (const [key, replacementArray] of Object.entries(rasiReplacements)) {
     const element = receivedDoc.querySelector(`img[src*="${key}"]`)
@@ -86,7 +84,7 @@ export async function getRasiPhalalu() {
     }
   }
 
-  return [raasiPhalamUrl, receivedDoc.body.innerHTML];
+  return [raasiPhalamUrl, article.innerHTML];
 }
 
 // https://assets.eenadu.net/article_img/${}
